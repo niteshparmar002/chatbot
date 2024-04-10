@@ -1,0 +1,105 @@
+<!-- chat/templates/chat/room.html -->
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Rooms</title>
+    <style>
+        .container {
+            border: 2px solid #dedede;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+          }
+          
+          .darker {
+            border-color: #ccc;
+            background-color: #ddd;
+          }
+          
+          .container::after {
+            content: "";
+            clear: both;
+            display: table;
+          }
+          span {
+            font-weight: bold;
+            font-size: larger;
+          }
+          
+    </style>
+</head>
+<body>
+    <div id="chat-log">
+        <h2>Chat Messages</h2>
+
+        {% for i in chats %}
+            {% if forloop.counter|divisibleby:2 %}
+                <div class="container darker">
+                    <span>{{i.sender.username}}:</span>
+                    <p>{{i.message}}</p>
+                </div>
+            {% else %}
+                <div class="container">
+                    <span>{{i.sender.username}}:</span>
+                    <p>{{i.message}}</p>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div class="speaker" style="padding:10px;width: fit-content;box-shadow: 0 0 13px #0000003d;border-radius: 5px;">
+        <button onclick="runSpeechRecog()" style="border: transparent;">
+            Speech
+        </button>
+    </div>
+    {{ room_name|json_script:"room-name" }}
+    <script>
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+        );
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            console.log(data, "aaaa")
+            const container = document.createElement('div');
+            container.classList.add('container');
+            container.innerHTML = `
+                <span>${data.user}:</span>
+                <p>${data.message}</p>
+            `;
+            document.querySelector('#chat-log').appendChild(container);
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+    </script>
+    <script>
+        runSpeechRecog = () => {
+            var action = document.getElementById('action');
+            let recognization = new webkitSpeechRecognition();
+            recognization.onresult = (e) => {
+                console.log(e, "eee")
+                var transcript = e.results[0][0].transcript;
+                console.log(transcript, "transcript")
+                chatSocket.send(JSON.stringify({
+                    'message': transcript,
+                    'user': {{request.user.id}}
+                }));
+            }
+            recognization.start();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!-- chat/templates/chat/index.html -->
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Rooms</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}" />
+</head>
+<body>
+    <div class="container">
+        <ul>
+            {% for i in channels %}
+                <li class="room-name-submit" onclick="send_channel(this);">
+                    <input class="room-name-input" type="hidden" value="{{i.id}}">
+                    ({{forloop.counter}}). {{i.name}}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <script>
+        function send_channel(e) {
+            var roomName = e.querySelector('.room-name-input').value;
+            console.log(roomName, "aaa")
+            window.location.pathname = roomName + '/';
+        };
+    </script>
+</body>
+</html>
