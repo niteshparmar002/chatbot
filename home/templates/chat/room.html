@@ -70,7 +70,7 @@
 
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            console.log(data, "aaaa")
+            console.log(data['bot_res'], "aaaa")
             const container = document.createElement('div');
             container.classList.add('container');
             container.innerHTML = `
@@ -78,6 +78,13 @@
                 <p>${data.message}</p>
             `;
             document.querySelector('#chat-log').appendChild(container);
+            const container1 = document.createElement('div');
+            container1.classList.add('container');
+            container1.innerHTML = `
+                <span>Bot:</span>
+                <p>${data.bot_res}</p>
+            `;
+            document.querySelector('#chat-log').appendChild(container1);
         };
 
         chatSocket.onclose = function(e) {
