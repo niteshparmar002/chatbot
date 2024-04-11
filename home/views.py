@@ -4,7 +4,10 @@ from .models import *
 
 def index(request):
     channels = Channel.objects.all()
-    return render(request, "chat/index.html", {'channels': channels})
+    if request.user.is_authenticated:
+        return render(request, "chat/index.html", {'channels': channels})
+    else:
+        return HttpResponse("User is not authenticated")
 
 
 def room(request, room_name):

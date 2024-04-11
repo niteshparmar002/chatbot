@@ -146,6 +146,6 @@ CHANNEL_LAYERS = {
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-openai_key_cohere='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'
-GOOGLE_KEY='AIzaSyD16ir13RTgkb6dU3t-HRx9GscVd6Nk-us'
-navapi_key='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'
+# openai_key_cohere='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'
+# GOOGLE_KEY='AIzaSyD16ir13RTgkb6dU3t-HRx9GscVd6Nk-us'
+# navapi_key='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'

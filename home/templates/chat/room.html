@@ -30,6 +30,9 @@
             font-weight: bold;
             font-size: larger;
           }
+          .hide {
+            display: none;
+          }
           
     </style>
 </head>
@@ -52,11 +55,22 @@
         {% endfor %}
     </div>
     <div class="speaker" style="padding:10px;width: fit-content;box-shadow: 0 0 13px #0000003d;border-radius: 5px;">
-        <button onclick="runSpeechRecog()" style="border: transparent;">
+        <button id="btn1" class="" onclick="runSpeechRecog()" style="border: transparent;">
             Speech
+        </button>
+        <button id="btn2" class="hide" style="border: transparent;">
+            Recording
         </button>
     </div>
     {{ room_name|json_script:"room-name" }}
+    <script>
+        function scrolltop() {
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+        window.onload = function() {
+            scrolltop();
+        };
+    </script>
     <script>
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
@@ -71,13 +85,13 @@
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
             console.log(data['bot_res'], "aaaa")
-            const container = document.createElement('div');
-            container.classList.add('container');
-            container.innerHTML = `
-                <span>${data.user}:</span>
-                <p>${data.message}</p>
-            `;
-            document.querySelector('#chat-log').appendChild(container);
+            // const container = document.createElement('div');
+            // container.classList.add('container');
+            // container.innerHTML = `
+            //     <span>${data.user}:</span>
+            //     <p>${data.message}</p>
+            // `;
+            // document.querySelector('#chat-log').appendChild(container);
             const container1 = document.createElement('div');
             container1.classList.add('container');
             container1.innerHTML = `
@@ -85,6 +99,10 @@
                 <p>${data.bot_res}</p>
             `;
             document.querySelector('#chat-log').appendChild(container1);
+            scrolltop();
+            const synth = window.speechSynthesis;
+            const utterThis = new SpeechSynthesisUtterance(data.bot_res);
+            synth.speak(utterThis);
         };
 
         chatSocket.onclose = function(e) {
@@ -94,12 +112,24 @@
     </script>
     <script>
         runSpeechRecog = () => {
+            document.getElementById("btn1").classList.add('hide');
+            document.getElementById("btn2").classList.remove('hide');
             var action = document.getElementById('action');
             let recognization = new webkitSpeechRecognition();
             recognization.onresult = (e) => {
                 console.log(e, "eee")
+                document.getElementById("btn1").classList.remove('hide');
+                document.getElementById("btn2").classList.add('hide');
                 var transcript = e.results[0][0].transcript;
                 console.log(transcript, "transcript")
+                const container = document.createElement('div');
+                container.classList.add('container');
+                container.innerHTML = `
+                    <span>{{request.user.username}}</span>
+                    <p>${transcript}</p>
+                `;
+                document.querySelector('#chat-log').appendChild(container);
+                scrolltop();
                 chatSocket.send(JSON.stringify({
                     'message': transcript,
                     'user': {{request.user.id}}

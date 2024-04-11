@@ -21,7 +21,7 @@ def AIResponse(text):
     llm =ChatGoogleGenerativeAI(model='gemini-pro',convert_system_message_to_human=True)
     result = llm.invoke(text)
 
-    print(result.content)
+    # print(result.content)
     return result.content
 
 class ChatConsumer(AsyncWebsocketConsumer):
